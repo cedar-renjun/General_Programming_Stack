@@ -189,6 +189,6 @@ int Stack_Push(Stack_t* pStack, void* pElement)
          *(pStack->pIndex++) = *_pElement++;
     }
 
-    return (NULL);
+    return (0);
 }
 
