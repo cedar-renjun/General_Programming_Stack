@@ -1,6 +1,52 @@
+//*****************************************************************************************
+//!
+//! \file   Stack.c
+//! \brief  Genernal Stack Model Implement.
+//!         You can use uniform stack API to manager different type of data
+//!         element.
+//! \author cedar
+//! \date   2013-11-26
+//! \email  xuesong5825718@gmail.com
+//!
+//! \license
+//!
+//! Copyright (c) 2013 Cedar MIT License
+//!
+//! Permission is hereby granted, free of charge, to any person obtaining a copy
+//! of this software and associated documentation files (the "Software"), to deal
+//! in the Software without restriction, including without limitation the rights to
+//! use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+//! the Software, and to permit persons to whom the Software is furnished to do so,
+//! subject to the following conditions:
+//!
+//! The above copyright notice and this permission notice shall be included in all
+//! copies or substantial portions of the Software.
+//!
+//! THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//! IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//! FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//! AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//! LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//! OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+//! IN THE SOFTWARE.
+///
+//*****************************************************************************************
 #include "Stack.h"
 
-#ifdef USE_MEMORY_ALLOC
+//******************************************************************************************
+//!                     ASSERT MACRO
+//******************************************************************************************
+#ifndef ASSERT
+
+#ifdef  NDEBUG
+#define ASSERT(x)
+#else
+#define ASSERT(x) do {while(!(x));} while(0)
+#endif
+
+#endif  // ASSERT
+
+#ifdef USE_DYNAMIC_MEMORY
 //******************************************************************************************
 //
 //! \brief  Create An New Stack.
@@ -20,11 +66,7 @@ Stack_t* Stack_Create(uint32_t StackSize, uint32_t UnitSize)
     uint8_t*  pStackBaseAddr = NULL;         //!< Stack Memory Base Address
 
     //! Check stack parameters.
-    if(StackSize <= UnitSize)
-    {
-        //! Error, exit now.
-        return (NULL);
-    }
+    ASSERT(StackSize > UnitSize);
 
     //! Allocate Memory for pointer of new stack.
     pStack = (Stack_t*) malloc(sizeof(Stack_t));
@@ -63,10 +105,8 @@ Stack_t* Stack_Create(uint32_t StackSize, uint32_t UnitSize)
 void Stack_Destory(Stack_t* pStack)
 {
     //! Check stack parameters.
-    if(NULL == pStack || NULL == pStack->pBaseAddr)
-    {
-        return; //!< Failure
-    }
+    ASSERT(NULL != pStack);
+    ASSERT(NULL != pStack->pBaseAddr);
 
     //! Free stack memory
     free(pStack->pBaseAddr);
@@ -79,7 +119,7 @@ void Stack_Destory(Stack_t* pStack)
 
     return;     //!< Success
 }
-#endif // USE_MEMORY_ALLOC
+#endif // USE_DYNAMIC_MEMORY
 
 //******************************************************************************************
 //
@@ -98,11 +138,9 @@ void Stack_Destory(Stack_t* pStack)
 int Stack_Init(Stack_t* pStack, void* pStackBaseAddr, uint32_t StackSize, uint32_t UnitSize)
 {
     //! Check stack parameters.
-    if(NULL == pStack || NULL == pStackBaseAddr || StackSize <= UnitSize)
-    {
-        //! Error, exit now.
-        return (-1);
-    }
+    ASSERT(NULL != pStack);
+    ASSERT(NULL != pStackBaseAddr);  
+    ASSERT(StackSize > UnitSize);
 
     //! Success, Initilize stack
     pStack->pBaseAddr = (uint8_t*) pStackBaseAddr;
@@ -130,11 +168,8 @@ int Stack_Pop(Stack_t* pStack, void* pElement)
     int i = 0;
 
     //! Check stack parameters.
-    if(NULL == pStack || NULL == pElement)
-    {
-        //! Error, exit now.
-        return (-1);
-    }
+    ASSERT(NULL != pStack);
+    ASSERT(NULL != pElement);   
 
     //! UnderFlow ?
     if(pStack->pIndex < pStack->pBaseAddr + pStack->UnitSize)
@@ -171,11 +206,8 @@ int Stack_Push(Stack_t* pStack, void* pElement)
     int i = 0;
 
     //! Check stack parameters.
-    if(NULL == pStack || NULL == pElement)
-    {
-        //! Error, exit now.
-        return (-1);
-    }
+    ASSERT(NULL != pStack);
+    ASSERT(NULL != pElement);
 
     //! Overflow ?
     if(pStack->pIndex + pStack->UnitSize > pStack->pEndAddr)
@@ -189,6 +221,33 @@ int Stack_Push(Stack_t* pStack, void* pElement)
          *(pStack->pIndex++) = *_pElement++;
     }
 
-    return (0);
+    return (NULL);
 }
 
+//******************************************************************************************
+//
+//! \brief  Stack is empty ?
+//!
+//! \param  [in] pStack is the pointer of valid stack.
+//!
+//! \retval - 1 Stack is empty
+//!         - 0 Stack is not empty.
+//
+//******************************************************************************************
+int Stack_IsEmpty(Stack_t* pStack)
+{
+    uint8_t * _pElement = (uint8_t *)pElement;
+
+    //! Check stack parameter.
+    ASSERT(NULL != pStack);
+
+    //! Empty ?
+    if(pStack->pIndex < (pStack->pBaseAddr + pStack->UnitSize))
+    {
+        return (1);    //!< Empty
+    }
+    else
+    {
+        return (0);    //!< Not Empty
+    }
+}  

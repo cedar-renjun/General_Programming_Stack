@@ -6,6 +6,7 @@
 //!         element.
 //! \author cedar
 //! \date   2013-11-22
+//! \email  xuesong5825718@gmail.com
 //!
 //! \license
 //!
@@ -44,7 +45,7 @@ extern "C"
 //******************************************************************************
 
 #define SYS_INTXX_T                         //!< Use stdint standard datatype
-#define USE_MEMORY_ALLOC                    //!< Use system malloc/free function
+#define USE_DYNAMIC_MEMORY                  //!< Use system malloc/free function
 
 
 #include <stdio.h>
@@ -56,7 +57,7 @@ typedef unsigned char uint8_t;
 typedef unsigned int  uint32_t;
 #endif
 
-#ifdef USE_MEMORY_ALLOC
+#ifdef USE_DYNAMIC_MEMORY
 #include <stdlib.h>
 #endif
 
@@ -78,14 +79,90 @@ typedef struct Stack_t
 //******************************************************************************
 //!                           PUBLIC API
 //******************************************************************************
-#ifdef USE_MEMORY_ALLOC
+
+#ifdef USE_DYNAMIC_MEMORY
+//******************************************************************************************
+//
+//! \brief  Create An New Stack.
+//!
+//! \param  [in] StackSize is the size of stack.
+//! \param  [in] UnitSize is the size of base element.
+//! \retval The Pointer of new create stack.
+//! \note   -# If StackSize <= UnitSize or memory allocate failure, this function will return
+//!            with NULL pointer, So, Caller must check return pointer carefully.
+//!
+//! \note   -# You must enable USE_MEMORY_ALLOC macro and ensure your system have <stdlib.h>
+//!            Header file before use this function.
+//******************************************************************************************
 extern Stack_t* Stack_Create(uint32_t StackSize, uint32_t UnitSize);
+
+//******************************************************************************************
+//
+//! \brief  Destory Stack
+//!  This function first release memory section, then reinit the stack pointer parameter.
+//!
+//! \param  [in] pStack is the pointer of valid stack.
+//! \retval None.
+//!
+//! \note   -# You must enable USE_MEMORY_ALLOC macro and ensure your system have <stdlib.h>
+//!            Header file before use this function.
+//
+//******************************************************************************************
 extern void Stack_Destory(Stack_t* pStack);
-#endif // USE_MEMORY_ALLOC
-extern int Stack_Init(Stack_t* pStack, void* pStackBaseAddr, uint32_t StackSize,
-        uint32_t UnitSize);
+#endif // USE_DYNAMIC_MEMORY
+
+//******************************************************************************************
+//
+//! \brief  Initialize an exist stack.
+//!
+//! \param  [in] pStack is the pointer of valid stack.
+//! \param  [in] pStackBaseAddr is the base address pre-alloc memory, such as array.
+//! \param  [in] StackSize is the size of stack.
+//! \param  [in] UnitSize is the size of base element.
+//! \retval 0 if initialize successfully, otherwise return -1.
+//!
+//! \note   -# If stack pointer invalid or memory allocate failure, this function will return
+//!            with NULL pointer, So, Caller must check return pointer carefully.
+//!
+//******************************************************************************************
+extern int Stack_Init(Stack_t* pStack, void* pStackBaseAddr, uint32_t StackSize, uint32_t UnitSize);
+
+//******************************************************************************************
+//
+//! \brief  Pop an element from stack.
+//!
+//! \param  [in]  pStack is the pointer of valid stack.
+//! \param  [out] pElement is the address of memory that store the pop element.
+//!
+//! \retval 0 if initialize successfully, otherwise return -1.
+//
+//******************************************************************************************
 extern int Stack_Pop(Stack_t* pStack, void* pElement);
+
+//******************************************************************************************
+//
+//! \brief  Push an element into stack.
+//!
+//! \param  [in] pStack is the pointer of valid stack.
+//! \param  [in] pElement is data element you want to push.
+//!
+//! \retval 0 if initialize successfully, otherwise return -1.
+//
+//******************************************************************************************
 extern int Stack_Push(Stack_t* pStack, void* pElement);
+
+//******************************************************************************************
+//
+//! \brief  Stack is empty ?
+//!
+//! \param  [in] pStack is the pointer of valid stack.
+//!
+//! \retval - 1 Stack is empty
+//!         - 0 Stack is not empty.
+//
+//******************************************************************************************
+extern int Stack_IsEmpty(Stack_t* pStack);
+
 
 #ifdef __cplusplus
 }
